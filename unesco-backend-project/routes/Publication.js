@@ -1,12 +1,18 @@
+// this file contains publication end points
+// operations implemented are
+// get all publications
+// get by id
+// create
+// update
+// delete
+
 const express = require('express');
 const router = express('Router');
-const mongoose= require('mongoose');
-
 
 const PublicationModel = require('../models/Publication')
 
-//
 router.use(express.json());
+
 // get all
 router.get('/',(req,res)=>{
     PublicationModel.find()
@@ -19,6 +25,7 @@ router.get('/',(req,res)=>{
         }
     })
 })
+
 // get specific by id
 router.get('/:id',(req,res)=>{
     PublicationModel.find({_id: req.params.id}).
@@ -42,6 +49,32 @@ router.post('/',(req,res)=>{
     })
 })
 
+// update
+// we replace the whole document here so
+// make sure to send full object data.
+router.put('/:id',(req, res)=>{
+    const data = req.body;
+    PublicationModel.replaceOne(
+        {_id:req.params.id},
+        data, 
+        (err, doc)=>{
+            if(!err) res.send(doc);
+            else {
+                res.status = 500;
+                res.send('error');
+            }
+        });
+});
+// delete
+router.delete('/:id', (req, res)=>{
+    PublicationModel.deleteOne({_id:req.params.id}, (err)=>{
+        if (!err)
+            res.send('deleted successfully');
+        else
+            res.send('error');
+        
+    });
+});
 
 
 
