@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express('Router');
-const mongoose= require('mongoose');
-const PhotoAlbum = require('../models/PhotoAlbum');
 
+const PhotoAlbum = require('../models/PhotoAlbum');
 const PhotoAlbumModel = require('../models/PhotoAlbum')
 
 router.use(express.json());
 
+// get all images
 router.get('/',(req,res)=>{
     
     PhotoAlbum.find((err,docs)=>{
@@ -14,7 +14,19 @@ router.get('/',(req,res)=>{
         else res.send('error')
     })
 });
-//
+// get by department
+// delete image
+router.delete('/:id', (req, res)=>{
+    PhotoAlbumModel.deleteOne({_id:req.params.id}, (err)=>{
+        if (!err)
+            res.send('deleted successfully');
+        else
+            res.send(err);
+        
+    });
+});
+
+// create
 router.post('/',(req,res)=>{
     const data = req.body;
     const PhotoAlbum = new PhotoAlbumModel(data);
@@ -25,9 +37,10 @@ router.post('/',(req,res)=>{
     })
 })
 
-
-
-
-   
+// notfound
+router.all('**',(req, res)=>{
+    res.status(404);
+    res.send('page not found');
+});
 
     module.exports=router;
