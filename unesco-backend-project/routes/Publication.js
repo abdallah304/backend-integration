@@ -38,6 +38,7 @@ router.get('/:id',(req,res)=>{
         }
     })
 })
+
 // create
 router.post('/',(req,res)=>{
     const data = req.body;
@@ -65,6 +66,7 @@ router.put('/:id',(req, res)=>{
             }
         });
 });
+
 // delete
 router.delete('/:id', (req, res)=>{
     PublicationModel.deleteOne({_id:req.params.id}, (err)=>{
@@ -76,6 +78,10 @@ router.delete('/:id', (req, res)=>{
     });
 });
 
-
+// not found
+router.all((req, res)=>{
+    res.status = 404;
+    res.send('page not found');
+});
 
     module.exports=router;
