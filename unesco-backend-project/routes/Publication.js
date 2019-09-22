@@ -3,8 +3,11 @@
 // get all publications
 // get by id
 // create
-// update
+// update 
 // delete
+// when fail i send object with error attribute
+// ex: {error:' error message'}
+// and proper status code
 
 const express = require('express');
 const router = express('Router');
@@ -21,20 +24,25 @@ router.get('/',(req,res)=>{
         if(!err){
             res.send(Publication);
         }else{
-            res.send('can not Read Books');
+            res.status(500);
+            res.send({'error':'cant get elements'});
         }
     })
 })
 
 // get specific by id
-router.get('/:id',(req,res)=>{
+router.get('/:id',(req, res, next)=>{
     PublicationModel.find({_id: req.params.id}).
     populate('user_id').
     exec((err,Publication)=>{
         if(!err){
             res.send(Publication);
+        }else if (err.name == 'CastError'){
+            res.status(404);
+            next();
         }else{
-            res.send('can not Read Books');
+            res.status(500);
+            res.send({'error':'find element error'});
         }
     })
 })
@@ -46,7 +54,11 @@ router.post('/',(req,res)=>{
     Publication.save((err,doc)=>{
 
         if(!err)res.send('ok in saving')
-        else res.send('erroe in saving')
+        else {
+            res.status(400); 
+            res.send({'error':'check required values'});
+        }
+
     })
 })
 
@@ -61,8 +73,8 @@ router.put('/:id',(req, res)=>{
         (err, doc)=>{
             if(!err) res.send(doc);
             else {
-                res.status = 500;
-                res.send('error');
+                res.status(500);
+                res.send({'error':'update fail'});
             }
         });
 });
@@ -72,16 +84,26 @@ router.delete('/:id', (req, res)=>{
     PublicationModel.deleteOne({_id:req.params.id}, (err)=>{
         if (!err)
             res.send('deleted successfully');
-        else
-            res.send('error');
+        else{
+            res.status(500);
+            res.send({'error':'error in delete'});
+        }
         
     });
 });
 
 // not found
-router.all((req, res)=>{
-    res.status = 404;
-    res.send('page not found');
+router.all('**',(req, res)=>{
+    res.status(404);
+    res.send({'error':'page not found'});
+});
+
+// not json format
+router.use((err, req, res, next)=>{
+    if (err){
+        res.status(400);
+        res.send({'error':'Check request format'});
+    }
 });
 
     module.exports=router;
